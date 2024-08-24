@@ -1,17 +1,11 @@
-"use server";
+// pages/api/search.js (or appropriate file path)
+"use server"
 import { scrapeAliExpress } from '@/lib/scraper';
 import { analyzeProducts } from '@/lib/aiAnalyzer';
-import { rateLimiter } from '@/lib/rateLimiter';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
   try { 
-    // Apply rate limiting
-    const rateLimitResult = await rateLimiter(request);
-    if (!rateLimitResult.success) {
-      return NextResponse.json({ error: 'Too many requests, please try again later.' }, { status: 429 });
-    }
-    
     const { searchTerm } = await request.json();
     if (!searchTerm) {
       return NextResponse.json({ error: 'Search term is required' }, { status: 400 });
