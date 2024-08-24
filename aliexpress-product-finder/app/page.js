@@ -4,6 +4,7 @@ import SearchForm from './Components/SearchForm';
 import ProductList from './Components/ProductList';
 import { saveAs } from 'file-saver';
 import { exportToShopifyCsv } from '@/lib/csvExporter';
+import Link from 'next/link';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -43,6 +44,8 @@ export default function Home() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">AliExpress Product Finder</h1>
+      <Link href={"/download"} style={{margin:"40px"}}>Tiktok Scraping</Link>
+      <br/>  <br/>
       <SearchForm onSearch={handleSearch} />
       {loading ? (
         <p>Searching for winning products...</p>
