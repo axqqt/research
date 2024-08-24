@@ -5,7 +5,7 @@ import { rateLimiter } from '@/lib/rateLimiter';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
-  try {
+  try { 
     // Apply rate limiting
     const rateLimitResult = await rateLimiter(request);
     if (!rateLimitResult.success) {
