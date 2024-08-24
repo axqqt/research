@@ -7,8 +7,9 @@ import { exportToShopifyCsv } from '@/lib/csvExporter';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [status,setStatus] = useState("")
+  const [status, setStatus] = useState("");
 
   const handleSearch = async (searchTerms) => {
     setLoading(true);
@@ -18,8 +19,8 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ searchTerm: searchTerms }),
       });
-      if(response.status===400){
-        setStatus("Ack! We were unable to find results for your prompt :(")
+      if (response.status === 400) {
+        setStatus("Ack! We were unable to find results for your prompt :(");
       }
       const data = await response.json();
       setProducts(data);
@@ -29,15 +30,14 @@ export default function Home() {
     setLoading(false);
   };
 
+  const handleAddProduct = (product) => {
+    setSelectedProducts([...selectedProducts, product]);
+  };
+
   const handleExport = () => {
-    // Convert products array to CSV
-    const csv = exportToShopifyCsv(products);
-
-    // Create a Blob from the CSV string
+    const csv = exportToShopifyCsv(selectedProducts);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-
-    // Trigger the download using file-saver
-    saveAs(blob, 'products.csv');
+    saveAs(blob, 'selected_products.csv');
   };
 
   return (
@@ -47,7 +47,12 @@ export default function Home() {
       {loading ? (
         <p>Searching for winning products...</p>
       ) : (
-        <ProductList products={products} onExport={handleExport} />
+        <ProductList 
+          products={products} 
+          selectedProducts={selectedProducts}
+          onAddProduct={handleAddProduct}
+          onExport={handleExport} 
+        />
       )}
       <h1>{status}</h1>
     </div>
