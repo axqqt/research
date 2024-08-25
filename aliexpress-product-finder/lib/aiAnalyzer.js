@@ -8,28 +8,45 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function analyzeProduct(product) {
-  const prompt = `Analyze this product as a potential "winning product": ${product.name}. Rate it on a scale of 1-10.`;
+  const prompt = `Analyze this product as a potential "winning product": "${product.name}". Rate it on a scale of 1-10. Your response should include a clear numeric score between 1 and 10, formatted as 'Score: X' where X is the numeric score.`;
 
   return retry(async (bail) => {
     try {
       // Generate content using the Gemini model
-      const result = await model.generateContent(prompt);
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ text: prompt }]}],
+        generationConfig: {
+          temperature: 0.2,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 200,
+        },
+      });
+
       const response = await result.response;
-      const text = await response.text();
+      const text = response.text();
+      const structuredOutput = response.candidates[0]?.content?.parts[0]?.functionCall;
 
-      // Extract the AI score from the response text
-      const aiScoreMatch = text.match(/\d+/);
-      if (!aiScoreMatch) {
-        throw new Error("AI response did not contain a valid score");
+      if (structuredOutput && structuredOutput.name === 'setScore' && structuredOutput.args?.score) {
+        return { ...product, aiScore: parseInt(structuredOutput.args.score, 10) };
+      } else {
+        // Fallback to text parsing if structured output is not available
+        const aiScoreMatch = text.match(/Score:\s*(\d+)/i);
+        if (!aiScoreMatch) {
+          console.log("Full AI response:", text);  // Log the full response for debugging
+          throw new Error("AI response did not contain a valid score");
+        }
+
+        const aiScore = parseInt(aiScoreMatch[1], 10);
+        if (isNaN(aiScore)) {
+          throw new Error("Parsed AI score is not a number");
+        }
+
+        return { ...product, aiScore };
       }
-
-      const aiScore = parseInt(aiScoreMatch[0], 10);
-      if (isNaN(aiScore)) {
-        throw new Error("Parsed AI score is not a number");
-      }
-
-      return { ...product, aiScore };
     } catch (error) {
+      console.error("Error in analyzeProduct:", error.message);
+      console.log("Full AI response:", text);  // Log the full response on error
       if (error.response && error.response.status === 429) {
         // Retry on rate limit errors
         throw error;
