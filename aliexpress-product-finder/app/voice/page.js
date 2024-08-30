@@ -71,6 +71,10 @@ const Page = () => {
     <div className="container mx-auto p-4">
       <br/>
       <Link href={"/"}>Back to homepage</Link>
+      <br/><br/>  
+      <Link href={"/download"} style={{ margin: "40px" }}>
+        Tiktok Scraping
+      </Link>
       <br/><br/>
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
       <form onSubmit={handleSubmit} className="mb-4">
