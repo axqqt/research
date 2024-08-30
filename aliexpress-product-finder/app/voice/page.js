@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import React, { useState } from 'react';
 
 const Page = () => {
@@ -14,7 +15,7 @@ const Page = () => {
     setAudioUrl('');
 
     try {
-      const response = await fetch('/api/tts', {
+      const response = await fetch('/api/ai-voice', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,10 +39,18 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <br/>
+      <Link href={"/"}>Back to homepage</Link>
+      <br/><br/>
+      <Link href={"/download"} style={{ margin: "40px" }}>
+        Tiktok Scraping
+      </Link>
+      <br/><br/>
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <textarea
           value={textPrompt}
+          style={{color:"black"}}
           onChange={(e) => setTextPrompt(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mb-2"
           rows="4"

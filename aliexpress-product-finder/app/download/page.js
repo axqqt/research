@@ -107,7 +107,10 @@ export default function Home() {
         <title>AI-Powered TikTok Video Downloader</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <br/>
       <Link href={"/"} style={{paddingTop:"60px"}}>Back to homepage</Link>
+      <br/><br/>
+      <Link href={"/voice"}>Ai voice generation</Link>
       <main>
         <h1 className="text-2xl font-bold text-center my-4">
           TikTok Video Downloader
