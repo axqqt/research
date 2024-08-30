@@ -9,7 +9,7 @@ export default function ProductList({
 }) {
   return (
     <div>
-      {products.length > 0 && (
+      {products.length > 0 ?  (
         <div>
           <h2 className="text-xl font-semibold mb-2">Search Results</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -22,7 +22,7 @@ export default function ProductList({
               />
             ))}
           </div>
-          {selectedProducts.length > 0 && (
+          {selectedProducts.length > 0 ? (
             <div className="flex flex-col gap-2 fixed right-0 top-1/2 -translate-y-1/2 bg-black w-[200px] m-2 mr-4 max-h-[calc(90vh)]">
               <h2 className="text-xl font-semibold mt-4 mb-2">
                 Selected Products
@@ -47,9 +47,9 @@ export default function ProductList({
                 Export Selected Products to CSV
               </button>
             </div>
-          )}
+          ) : <h1>No results found</h1>}
         </div>
-      )}
+      ): <h1>No results found</h1>}
     </div>
   );
 }
