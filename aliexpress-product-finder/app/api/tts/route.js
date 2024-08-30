@@ -1,13 +1,14 @@
+"use server";
 import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
-    const { textPrompt } = await req.json();
+    const { textPrompt, voiceId } = await req.json();
     
     const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_LABS_API_KEY });
     
-    const audio = await client.textToSpeech.convert("pMsXgVXv3BLzUgSXRplE", {
+    const audio = await client.textToSpeech.convert(voiceId, {
       optimize_streaming_latency: ElevenLabs.OptimizeStreamingLatency.Zero,
       output_format: ElevenLabs.OutputFormat.Mp3_22050_32,
       text: textPrompt,
