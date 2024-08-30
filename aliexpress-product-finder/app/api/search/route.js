@@ -12,10 +12,10 @@ export async function POST(request) {
     }
 
     const scrapedProducts = await scrapeAliExpress(searchTerm);
-    const analyzedProducts = await analyzeProducts(scrapedProducts);
-    const topProducts = analyzedProducts.slice(0, 15); // Get top 15 products
+    // const analyzedProducts = await analyzeProducts(scrapedProducts);
+    // const topProducts = analyzedProducts.slice(0, 15); // Get top 15 products
 
-    const response = NextResponse.json(topProducts, { status: 200 });
+    const response = NextResponse.json(scrapedProducts, { status: 200 });
 
     // Set CORS headers
     response.headers.set('Access-Control-Allow-Credentials', 'true');
