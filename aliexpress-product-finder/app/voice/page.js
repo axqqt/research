@@ -10,10 +10,9 @@ const Page = () => {
   const [voices, setVoices] = useState([]);
 
   useEffect(() => {
-    // Fetch available voices from ElevenLabs API
     const fetchVoices = async () => {
       try {
-        const response = await fetch('/api/voices'); // You'll need to create this endpoint
+        const response = await fetch('/api/voices');
         if (!response.ok) throw new Error('Failed to fetch voices');
         const data = await response.json();
         setVoices(data);
@@ -56,6 +55,17 @@ const Page = () => {
     }
   };
 
+  const handleDownload = () => {
+    if (audioUrl) {
+      const link = document.createElement('a');
+      link.href = audioUrl;
+      link.download = 'generated_speech.mp3';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
@@ -93,9 +103,17 @@ const Page = () => {
       {audioUrl && (
         <div>
           <h2 className="text-xl font-semibold mb-2">Generated Audio:</h2>
-          <audio controls src={audioUrl} className="w-full">
-            Your browser does not support the audio element.
-          </audio>
+          <div className="flex items-center space-x-4">
+            <audio controls src={audioUrl} className="flex-grow">
+              Your browser does not support the audio element.
+            </audio>
+            <button
+              onClick={handleDownload}
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            >
+              Download MP3
+            </button>
+          </div>
         </div>
       )}
     </div>
