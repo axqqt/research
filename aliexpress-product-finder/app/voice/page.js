@@ -80,6 +80,7 @@ const Page = () => {
       <form onSubmit={handleSubmit} className="mb-4">
         <textarea
           value={textPrompt}
+          style={{color:"black"}}
           onChange={(e) => setTextPrompt(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mb-2"
           rows="4"
