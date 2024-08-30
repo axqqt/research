@@ -94,7 +94,7 @@ const Page = () => {
           className="w-full p-2 border border-gray-300 rounded mb-2"
           required
         >
-          {voices.map((voice) => (
+          { voices && voices.length && voices.map((voice) => (
             <option key={voice.voice_id} value={voice.voice_id}>
               {voice.name}
             </option>
