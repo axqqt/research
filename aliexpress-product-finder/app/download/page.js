@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import ReactPlayer from "react-player";
 import VideoEditor from "../Components/VideoEditor";
 import Link from "next/link";
+import Cookies from 'js-cookie';
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -13,6 +14,18 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [vidNumber, setVidNumber] = useState(1);
   const [editedVideos, setEditedVideos] = useState([]);
+
+  useEffect(() => {
+    // Load videos from cookies when the component mounts
+    const savedVideos = Cookies.get('savedVideos');
+    if (savedVideos) {
+      setVideos(JSON.parse(savedVideos));
+    }
+  }, []);
+
+  const saveVideosToCookies = (videos) => {
+    Cookies.set('savedVideos', JSON.stringify(videos), { expires: 7 }); // Expires in 7 days
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +42,7 @@ export default function Home() {
       const data = await response.json();
       if (data.videos && data.videos.length > 0) {
         setVideos(data.videos);
+        saveVideosToCookies(data.videos);
       } else {
         setVideos([]);
         setMessage(data.message || "No videos found. Please try a different prompt.");
@@ -43,32 +57,10 @@ export default function Home() {
   const handleDownload = (url) => {
     try {
       // Open the video URL in a new tab
-      const newTab = window.open(url, '_blank');
-      
-      // Check if the new tab was successfully opened
-      if (!newTab) {
-        throw new Error('Failed to open the new tab.');
-      }
-      
-      // Set a timeout to trigger the download after the new tab has loaded
-      setTimeout(() => {
-        // Create a temporary link to trigger the download
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "video.mp4";  // Ensure a filename is set
-        link.style.display = "none";
-        
-        // Append the link to the body
-        document.body.appendChild(link);
-        link.click();
-        
-        // Remove the link after triggering download
-        link.remove();
-      }, 500); // Adjust the timeout as needed
-
+      window.open(url, '_blank');
     } catch (error) {
-      console.error("Error downloading video:", error);
-      setMessage("Failed to download video. Please try again.");
+      console.error("Error opening video in new tab:", error);
+      setMessage("Failed to open video in new tab. Please try again.");
     }
   };
 
