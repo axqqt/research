@@ -1,4 +1,5 @@
 "use client";
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 
 const Page = () => {
@@ -68,6 +69,9 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <br/>
+      <Link href={"/"}>Back to homepage</Link>
+      <br/><br/>
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <textarea
