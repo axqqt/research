@@ -164,14 +164,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h2 className="text-xl font-semibold mb-2">Video {index + 1}</h2>
-                  <button
+                  <h2 className="text-xl font-semibold mb-2" style={{color:"black"}}>Video {index + 1}</h2>
+                  {/* <button
                     onClick={() => handleDownloadAndEdit(video.play)}
                     className="bg-green-500 text-white py-2 px-4 rounded cursor-pointer mr-2"
                     disabled={loading}
                   >
                     Download & Edit
-                  </button>
+                  </button> */}
                 </div>
               </div>
             ))
