@@ -118,19 +118,20 @@ export default function Home() {
             className="border p-2 mb-4 w-full max-w-lg rounded"
             required
           />
-          <span className="mb-4">
-            <label className="block mb-1">Enter number of vids needed (min 1, max 10)</label>
-            <input
-              type="number"
+          <div className="mb-4 w-full max-w-lg">
+            <label className="block mb-1">Select number of videos (1-10)</label>
+            <select
               value={vidNumber}
-              style={{ color: "black" }}
               onChange={(e) => setVidNumber(Number(e.target.value))}
-              className="border p-2 w-full max-w-lg rounded"
-              min={1}
-              max={10}
+              className="border p-2 w-full rounded"
+              style={{ color: "black" }}
               required
-            />
-          </span>
+            >
+              {[...Array(10)].map((_, i) => (
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              ))}
+            </select>
+          </div>
 
           <button
             type="submit"
