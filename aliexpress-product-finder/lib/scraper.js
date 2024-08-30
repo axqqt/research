@@ -1,69 +1,39 @@
 import puppeteer from 'puppeteer';
-import { Redis } from '@upstash/redis';
-import axios from 'axios';
 
 const defaultImageUrl = "/default-image.avif"
 
-const UPSTASH_REDIS_URL = process.env.UPSTASH_REDIS_URL
-const UPSTASH_REDIS_TOKEN = process.env.UPSTASH_REDIS_TOKEN
-if (!UPSTASH_REDIS_URL || !UPSTASH_REDIS_TOKEN) {
-  throw new Error('Please set UPSTASH_REDIS_URL and UPSTASH_REDIS_TOKEN in your environment variables');
-}
+const CURRENCY_CONVERSION_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_URL,
-  token: process.env.UPSTASH_REDIS_TOKEN,
-});
-
-const CURRENCY_CONVERSION_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD'; // Replace with your currency conversion API URL
-
-// Function to convert currency to USD
 async function convertToUSD(price, fromCurrency) {
   try {
-    const response = await axios.get(CURRENCY_CONVERSION_API_URL);
-    const rates = response.data.rates;
+    const response = await fetch(CURRENCY_CONVERSION_API_URL);
+    const data = await response.json();
+    const rates = data.rates;
     const conversionRate = rates[fromCurrency];
     if (conversionRate) {
-      return (price / conversionRate).toFixed(2); // Convert and round to 2 decimal places
+      return (price / conversionRate).toFixed(2);
     }
   } catch (error) {
     console.error('Currency conversion error:', error);
   }
-  return price; // Return original price if conversion fails
+  return price;
 }
 
 export async function scrapeAliExpress(searchTerm) {
-  const cacheKey = `aliexpress:${searchTerm}`;
-  
-  // Fetch cached results
-  const cachedResults = await redis.get(cacheKey);
-  
-  // If cache exists, parse it as JSON and return
-  if (cachedResults) {
-    try {
-      // Check if cachedResults is already an object
-      if (typeof cachedResults === 'string') {
-        return JSON.parse(cachedResults);
-      }
-      return cachedResults; // If it's an object, return it directly
-    } catch (error) {
-      console.error('Error parsing cached results:', error);
-      // If parsing fails, proceed to scrape the data again
-    }
-  }
-
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  await page.goto(`https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(searchTerm)}`);
+  
+  // Randomize the page number to get different results each time
+  const randomPage = Math.floor(Math.random() * 5) + 1; // Random page between 1 and 5
+  await page.goto(`https://www.aliexpress.com/wholesale?SearchText=${encodeURIComponent(searchTerm)}&page=${randomPage}`);
 
   const products = await page.evaluate(async (defaultImageUrl) => {
-    const currency = 'USD'; // Assume prices are initially in USD or set this based on local currency
+    const currency = 'USD';
     const exchangeRates = await fetch('https://api.exchangerate-api.com/v4/latest/USD')
       .then(response => response.json())
       .then(data => data.rates);
     
     function parsePrice(priceText) {
-      // Extract the numeric part of the price
       const priceMatch = priceText.match(/[\d.,]+/);
       if (priceMatch) {
         return parseFloat(priceMatch[0].replace(',', ''));
@@ -74,14 +44,26 @@ export async function scrapeAliExpress(searchTerm) {
     async function convertToUSD(price, fromCurrency) {
       const conversionRate = exchangeRates[fromCurrency];
       if (conversionRate) {
-        return (price / conversionRate).toFixed(2); // Convert and round to 2 decimal places
+        return (price / conversionRate).toFixed(2);
       }
-      return price; // Return original price if conversion fails
+      return price;
     }
 
-    return Promise.all(Array.from(document.querySelectorAll('.search-item-card-wrapper-gallery')).map(async el => {
+    const allProducts = Array.from(document.querySelectorAll('.search-item-card-wrapper-gallery'));
+    
+    // Shuffle the array of products
+    for (let i = allProducts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allProducts[i], allProducts[j]] = [allProducts[j], allProducts[i]];
+    }
+
+    // Select a random number of products (between 10 and 20)
+    const randomProductCount = Math.floor(Math.random() * 11) + 10;
+    const selectedProducts = allProducts.slice(0, randomProductCount);
+
+    return Promise.all(selectedProducts.map(async el => {
       const priceText = el.querySelector('.multi--price-sale--U-S0jtj')?.innerText || 'No price available';
-      const localCurrency = 'CNY'; // Replace this with the detected local currency if available
+      const localCurrency = 'CNY';
       const price = parsePrice(priceText);
       const priceInUSD = price ? await convertToUSD(price, localCurrency) : 'No price available';
 
@@ -95,9 +77,6 @@ export async function scrapeAliExpress(searchTerm) {
   }, defaultImageUrl);
 
   await browser.close();
-
-  // Cache the results for 1 hour
-  await redis.setex(cacheKey, 3600, JSON.stringify(products));
   
   return products;
 }
