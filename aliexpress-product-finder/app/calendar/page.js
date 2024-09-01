@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React, { useState, useEffect } from "react";
 
 const Page = () => {
@@ -33,7 +34,8 @@ const Page = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4 text-black">Holiday Finder</h1>
-
+    <Link href={"/"}>Back to Homepage</Link>
+    <br/> <br/>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
         <div className="flex gap-4">
           <select
