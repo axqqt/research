@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 const Page = () => {
   const [country, setCountry] = useState("US");
@@ -14,10 +14,23 @@ const Page = () => {
   const fetchHolidays = async () => {
     setLoading(true);
     try {
-      const response =
-        await fetch(`https://api.api-ninjas.com/v1/${holidays}?country=${country}&year=${year}&type=observance`);
+      const apiUrl = `https://api.api-ninjas.com/v1/holidays?country=${country}&year=${year}`;
+      const response = await fetch(apiUrl, {
+        headers: {
+          'X-Api-Key': process.env.holidayKey // Replace with your actual API key
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
       const data = await response.json();
-      setHolidays(data);
+      const holidaysMapped = data.reduce((acc, holiday) => {
+        acc[holiday.name] = holiday.date;
+        return acc;
+      }, {});
+      setHolidays(holidaysMapped);
     } catch (error) {
       console.error("Error fetching holidays:", error);
       setHolidays([]);
@@ -34,8 +47,8 @@ const Page = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4 text-black">Holiday Finder</h1>
-    <Link href={"/"}>Back to Homepage</Link>
-    <br/> <br/>
+      <Link href={"/"}>Back to Homepage</Link>
+      <br /> <br />
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-4">
         <div className="flex gap-4">
           <select
@@ -75,9 +88,9 @@ const Page = () => {
         <p className="text-black">Loading holidays...</p>
       ) : (
         <ul className="text-black">
-          {holidays.map((holiday, index) => (
+          {Object.entries(holidays).map(([name, date], index) => (
             <li key={index} className="mb-2">
-              <strong>{holiday.name}</strong> - {holiday.date}
+              <strong>{name}</strong> - {date}
             </li>
           ))}
         </ul>
