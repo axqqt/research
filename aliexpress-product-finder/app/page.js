@@ -49,6 +49,9 @@ export default function Home() {
       <Link href={"/download"} style={{ margin: "40px" }}>
         Tiktok Scraping
       </Link>
+      <Link href={"/calendar"} style={{ margin: "40px" }}>
+        Open Calendar
+      </Link>
       <Link href={"/voice"}>Ai voice generation</Link>
       <br /> <br />
       <SearchForm onSearch={handleSearch} />
