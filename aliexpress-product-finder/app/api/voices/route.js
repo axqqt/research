@@ -1,14 +1,14 @@
 "use server";
-import { ElevenLabsClient } from "elevenlabs";
+
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  try {
-    const client = new ElevenLabsClient({ apiKey: process.env.ELEVEN_LABS_API_KEY });
-    
-    const voices = await client.voices.getAll();
+  const options = { method: 'GET' };
 
-    return NextResponse.json(voices);
+  try {
+    const response = await fetch('https://api.elevenlabs.io/v1/voices', options);
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching voices:', error);
     return NextResponse.json({ error: 'Failed to fetch voices' }, { status: 500 });
