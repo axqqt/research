@@ -16,7 +16,11 @@ const Page = () => {
         const response = await fetch('/api/voices');
         if (!response.ok) throw new Error('Failed to fetch voices');
         const data = await response.json();
+
+        // Assuming 'data' is an array of voice objects
         setVoices(data);
+
+        // Set the first voice's voice_id as the default selected voice
         if (data.length > 0) setSelectedVoice(data[0].voice_id);
       } catch (err) {
         console.error('Error fetching voices:', err);
@@ -69,39 +73,44 @@ const Page = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <br/>
+      <br />
       <Link href={"/"}>Back to homepage</Link>
-      <br/><br/>  
+      <br /><br />
       <Link href={"/download"} style={{ margin: "40px" }}>
         Tiktok Scraping
       </Link>
-      <br/><br/>
+      <br /><br />
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <textarea
           value={textPrompt}
-          style={{color:"black"}}
+          style={{ color: "black" }}
           onChange={(e) => setTextPrompt(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mb-2"
           rows="4"
           placeholder="Enter text to convert to speech"
           required
-        />
+        /> 
+        <br/><br/>
         <select
           value={selectedVoice}
-          style={{color:"black"}}
+          style={{ color: "black" }}
           onChange={(e) => setSelectedVoice(e.target.value)}
           className="w-full p-2 border border-gray-300 rounded mb-2"
           required
         >
-          {voices.length > 0 ? voices.map((voice) => (
-            <option key={voice.voice_id} value={voice.voice_id}>
-              {voice.name}
-            </option>
-          )) : (
+          {voices.length > 0 ? (
+            voices.map((voice) => (
+              <option key={voice.voice_id} value={voice.voice_id}>
+                {voice.name} ({voice.labels.accent})
+              </option>
+            ))
+          ) : (
             <option value="">Loading voices...</option>
           )}
         </select>
+        <br/>
+      <br/>
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
