@@ -94,11 +94,13 @@ const Page = () => {
           className="w-full p-2 border border-gray-300 rounded mb-2"
           required
         >
-          { voices && voices.length && voices.map((voice) => (
+          {voices.length > 0 ? voices.map((voice) => (
             <option key={voice.voice_id} value={voice.voice_id}>
               {voice.name}
             </option>
-          ))}
+          )) : (
+            <option value="">Loading voices...</option>
+          )}
         </select>
         <button
           type="submit"
