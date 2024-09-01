@@ -20,6 +20,8 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ searchTerm: searchTerms }),
       });
+      console.log(response.data ? response.data : `No data found`);
+      
       if (response.status === 400) {
         setStatus("Ack! We were unable to find results for your prompt :(");
       }
