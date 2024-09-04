@@ -13,7 +13,7 @@ const Page = () => {
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await fetch("/api/voices");
+        const response = await fetch("/api/voices",{method:"GET"});
         if (!response.ok) throw new Error("Failed to fetch voices");
         const data = await response.json();
 
