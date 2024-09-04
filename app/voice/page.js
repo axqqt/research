@@ -1,20 +1,20 @@
 "use client";
-import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import Link from "next/link";
+import React, { useState, useEffect } from "react";
 
 const Page = () => {
-  const [textPrompt, setTextPrompt] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
+  const [textPrompt, setTextPrompt] = useState("");
+  const [audioUrl, setAudioUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [selectedVoice, setSelectedVoice] = useState('');
+  const [error, setError] = useState("");
+  const [selectedVoice, setSelectedVoice] = useState("");
   const [voices, setVoices] = useState([]);
 
   useEffect(() => {
     const fetchVoices = async () => {
       try {
-        const response = await fetch('/api/voices');
-        if (!response.ok) throw new Error('Failed to fetch voices');
+        const response = await fetch("/api/voices");
+        if (!response.ok) throw new Error("Failed to fetch voices");
         const data = await response.json();
 
         // Assuming 'data' is an array of voice objects
@@ -23,8 +23,8 @@ const Page = () => {
         // Set the first voice's voice_id as the default selected voice
         if (data.length > 0) setSelectedVoice(data[0].voice_id);
       } catch (err) {
-        console.error('Error fetching voices:', err);
-        setError('Failed to load voices');
+        console.error("Error fetching voices:", err);
+        setError("Failed to load voices");
       }
     };
 
@@ -34,20 +34,20 @@ const Page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
-    setAudioUrl('');
+    setError("");
+    setAudioUrl("");
 
     try {
-      const response = await fetch('/api/tts', {
-        method: 'POST',
+      const response = await fetch("/api/tts", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ textPrompt, voiceId: selectedVoice }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to convert text to speech');
+        throw new Error("Failed to convert text to speech");
       }
 
       const audioBlob = await response.blob();
@@ -62,9 +62,9 @@ const Page = () => {
 
   const handleDownload = () => {
     if (audioUrl) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = audioUrl;
-      link.download = 'generated_speech.mp3';
+      link.download = "generated_speech.mp3";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -75,11 +75,13 @@ const Page = () => {
     <div className="container mx-auto p-4">
       <br />
       <Link href={"/"}>Back to homepage</Link>
-      <br /><br />
+      <br />
+      <br />
       <Link href={"/download"} style={{ margin: "40px" }}>
         Tiktok Scraping
       </Link>
-      <br /><br />
+      <br />
+      <br />
       <h1 className="text-2xl font-bold mb-4">Text-to-Speech Converter</h1>
       <form onSubmit={handleSubmit} className="mb-4">
         <textarea
@@ -90,8 +92,9 @@ const Page = () => {
           rows="4"
           placeholder="Enter text to convert to speech"
           required
-        /> 
-        <br/><br/>
+        />
+        <br />
+        <br />
         <select
           value={selectedVoice}
           style={{ color: "black" }}
@@ -102,21 +105,22 @@ const Page = () => {
           {voices.length > 0 ? (
             voices.map((voice) => (
               <option key={voice.voice_id} value={voice.voice_id}>
-                {voice.name} ({voice.labels.accent})
+                {voice.name} - {voice.accent} ({voice.language}, {voice.gender},{" "}
+                {voice.age})
               </option>
             ))
           ) : (
             <option value="">Loading voices...</option>
           )}
         </select>
-        <br/>
-      <br/>
+        <br />
+        <br />
         <button
           type="submit"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           disabled={isLoading}
         >
-          {isLoading ? 'Converting...' : 'Convert to Speech'}
+          {isLoading ? "Converting..." : "Convert to Speech"}
         </button>
       </form>
       {error && <p className="text-red-500 mb-4">{error}</p>}

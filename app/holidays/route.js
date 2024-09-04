@@ -13,6 +13,7 @@ export async function GET(req) {
       `https://api.api-ninjas.com/v1/holidays?country=${country}&year=${year}&type=observance`
     );
     const data = await response.json();
+    
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching holidays:", error);
