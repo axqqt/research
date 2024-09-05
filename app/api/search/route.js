@@ -1,7 +1,5 @@
-// pages/api/search.js (or appropriate file path)
-"use server"
+// app/api/search/route.js
 import { scrapeAliExpress } from '@/lib/scraper';
-import { analyzeProducts } from '@/lib/aiAnalyzer';
 import { NextResponse } from 'next/server';
 
 export async function POST(request) {
@@ -33,7 +31,6 @@ export async function POST(request) {
   }
 }
 
-// Handle preflight requests (OPTIONS)
 export async function OPTIONS() {
   const response = new NextResponse(null, { status: 204 });
 
