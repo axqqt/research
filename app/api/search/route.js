@@ -1,4 +1,5 @@
 // app/api/search/route.js
+"use server"
 import { scrapeAliExpress } from '@/lib/scraper';
 import { NextResponse } from 'next/server';
 
