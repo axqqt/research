@@ -6,49 +6,39 @@ if (!RAPIDAPI_KEY) {
 
 export async function POST(request) {
   try {
-    const { prompt, novids } = await request.json();
-    if (!prompt || prompt.length === 0) {
-      return new Response(JSON.stringify({ error: 'Prompt is required' }), { status: 400 });
-    }
-    
-    // Validate `novids`
-    if (!Number.isInteger(novids) || novids < 1 || novids > 10) {
-      return new Response(JSON.stringify({ error: 'Number of videos should be between 1 and 10' }), { status: 400 });
+    const { keyword } = await request.json();
+    if (!keyword || keyword.length === 0) {
+      return new Response(JSON.stringify({ error: 'Keyword is required' }), { status: 400 });
     }
 
-    const encodedPrompt = encodeURIComponent(prompt);
-    const apiUrl = `https://tiktok-video-no-watermark2.p.rapidapi.com/feed/search?keywords=${encodedPrompt}&count=${novids}&cursor=0&region=US&publish_time=0&sort_type`;
+    const encodedKeyword = encodeURIComponent(keyword);
+    const apiUrl = `https://tiktok-apis.p.rapidapi.com/v1/tiktok/search/user?keyword=${encodedKeyword}`;
 
-    const scraperRequest = new Request(apiUrl, {
+    const apiRequest = new Request(apiUrl, {
       method: 'GET',
       headers: {
-        'x-rapidapi-host': 'tiktok-video-no-watermark2.p.rapidapi.com',
+        'x-rapidapi-host': 'tiktok-apis.p.rapidapi.com',
         'x-rapidapi-key': RAPIDAPI_KEY,
       },
     });
 
-    const scraperResponse = await fetch(scraperRequest);
+    const apiResponse = await fetch(apiRequest);
 
     // Check for HTTP errors
-    if (!scraperResponse.ok) {
-      const errorText = await scraperResponse.text();
+    if (!apiResponse.ok) {
+      const errorText = await apiResponse.text();
       console.error('API error:', errorText);
-      return new Response(JSON.stringify({ error: 'Failed to fetch data from the API' }), { status: scraperResponse.status });
+      return new Response(JSON.stringify({ error: 'Failed to fetch data from the API' }), { status: apiResponse.status });
     }
 
-    const { code, data } = await scraperResponse.json();
+    const data = await apiResponse.json();
 
-    if (code !== 0) {
-      console.log('Error in scraper API:', data);
-      return new Response(JSON.stringify({ error: 'An error occurred in the scraper API' }), { status: 500 });
+    if (data.error) {
+      console.log('Error in TikTok API:', data.error);
+      return new Response(JSON.stringify({ error: 'An error occurred in the TikTok API' }), { status: 500 });
     }
 
-    const videos = data?.videos || [];
-    if (videos.length === 0) {
-      return new Response(JSON.stringify({ message: 'No videos found', videos: [] }), { status: 200 });
-    }
-
-    return new Response(JSON.stringify({ videos }), { status: 200 });
+    return new Response(JSON.stringify(data), { status: 200 });
   } catch (error) {
     console.error('Error in /api/search:', error);
     return new Response(JSON.stringify({ error: 'An error occurred', details: error.message }), { status: 500 });
