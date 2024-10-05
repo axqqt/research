@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Papa from 'papaparse'
 import { transformShopifyToEbayFormat } from '../../lib/transform'
 
-export function CSVUploader({ setTransformedData }) {
+export function CSVUploader({ transformedData, setTransformedData }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [downloadReady, setDownloadReady] = useState(false)
